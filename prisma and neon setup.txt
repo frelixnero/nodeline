@@ -1,0 +1,70 @@
+Here’s a **step‑by‑step checklist** you can reuse whenever you set up Prisma with a Neon PostgreSQL database on Windows. This captures all the pitfalls you ran into and the fixes that worked:
+
+---
+
+## 🛠️ Prisma + Neon Setup Checklist (Windows)
+
+1. **Use `.env` for DATABASE_URL**  
+   - Don’t set inline environment variables in PowerShell/CMD.  
+   - Put your connection string in `.env`:
+     ```
+     DATABASE_URL="postgresql://user:password@host/dbname?sslmode=require"
+     ```
+
+2. **Update schema.prisma datasource**  
+   ```prisma
+   datasource db {
+     provider = "postgresql"
+     url      = env("DATABASE_URL")
+   }
+   ```
+
+3. **Run commands with npx.cmd**  
+   - PowerShell blocks `npx.ps1`.  
+   - Always run:
+     ```bash
+     npx.cmd prisma migrate dev
+     npx.cmd prisma generate
+     ```
+
+4. **Handle IPv6 issues**  
+   - Neon hostnames resolve to IPv6 first.  
+   - If your network doesn’t support IPv6, Prisma fails with `P1001`.  
+   - Fix: use Neon’s **direct IPv4 address** in `.env`:
+     ```
+     postgresql://user:password@3.220.135.142/dbname?sslmode=require&options=endpoint%3Dep-yourendpointid
+     ```
+
+5. **Wake up Neon compute**  
+   - In Neon dashboard, make sure the branch compute isn’t idle.  
+   - Resume or run a query to activate it before migrating.
+
+6. **Test connection with psql**  
+   ```bash
+   psql "postgresql://user:password@3.220.135.142/dbname?sslmode=require&options=endpoint%3Dep-yourendpointid"
+   ```
+   - Confirms credentials and routing are correct.
+
+7. **Run migration and client generation**  
+   - Migration:
+     ```bash
+     npx.cmd prisma migrate dev --name init
+     ```
+   - Client generation:
+     ```bash
+     npx.cmd prisma generate
+     ```
+
+---
+
+## ✅ Outcome
+- Database connects reliably (IPv4 enforced).  
+- Prisma migrations succeed.  
+- Client is generated under `src/generated/prisma`.  
+- You’re ready to run your app without connection errors.
+
+---
+
+👉 If you follow this checklist each time, you’ll avoid the **PowerShell blocking**, **inline env variable**, and **IPv6 routing** issues that caused your earlier failures.  
+
+Would you like me to also create a **ready‑to‑paste `.env` + schema.prisma template** with placeholders, so you can reuse it for any new Neon project without re‑debugging?

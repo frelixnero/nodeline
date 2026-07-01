@@ -1,3 +1,10 @@
 prisma/client 6.16.3
 
 to luanch prisma studio: npx prisma studio
+
+tanstack/react query - 5.90.2
+trpc/client - 11.6.0
+trpc/server - 11.6.0
+trpc/tanstack-react-query - 11.6.0
+client only - 0.0.1
+server only - 0.0.1

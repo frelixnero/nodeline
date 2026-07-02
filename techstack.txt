@@ -1,4 +1,12 @@
 reactQuery
+shadcn ui
+zod
 prisma
 trpc
 neon
+hydration boundary tanstack reactQuery
+client side vs server side rendering
+better auth library
+middleware protection using trpc protected procedure, data access layer and server only componets
+Next js middlewareis more of a proxy
+serve componensts cannot be used for onclick 

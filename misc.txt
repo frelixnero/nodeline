@@ -17,3 +17,5 @@ middleware protection using trpc protected procedure, data access layer and serv
 Next js middlewareis more of a proxy
 serve componensts cannot be used for onclick 
 components reusability using props and empty tag <>{childred}</>, single layout.tsx file shared by folder in route group
+extracting contents javascript and react
+to install cli npm install --save-dev --save-exact <package-name>@<version>

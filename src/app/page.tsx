@@ -16,9 +16,15 @@ const Page =  () => {
   const {data} = useQuery(trpc.getWorkFlows.queryOptions())
 
   const testAi = useMutation(trpc.testAi.mutationOptions({
+    onMutate: () => {
+      toast("Job request sent", { duration: 2000 });
+    },
     onSuccess: () => {
       toast.success("Job queued successfully")
       // queryClient.invalidateQueries(trpc.getWorkFlows.queryOptions())
+    },
+    onError: (error) => {
+      toast.error(`${error.message} Unable to queue job`);
     }
   }))
 

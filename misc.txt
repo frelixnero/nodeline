@@ -19,4 +19,5 @@ serve componensts cannot be used for onclick
 components reusability using props and empty tag <>{childred}</>, single layout.tsx file shared by folder in route group
 extracting contents javascript and react
 to install cli npm install --save-dev --save-exact <package-name>@<version>
-sentry fro production grade eror tracking 
+sentry fro production grade eror tracking
+destructuring and promise using interface data types tp pass dynamic params to 

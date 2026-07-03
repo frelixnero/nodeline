@@ -10,7 +10,7 @@ zod
 prisma
 trpc
 neon
-hydration boundary tanstack reactQuery
+hydration boundary tanstack reactQuery for server side state management
 client side vs server side rendering
 better auth library
 middleware protection using trpc protected procedure, data access layer and server only componets
@@ -19,3 +19,4 @@ serve componensts cannot be used for onclick
 components reusability using props and empty tag <>{childred}</>, single layout.tsx file shared by folder in route group
 extracting contents javascript and react
 to install cli npm install --save-dev --save-exact <package-name>@<version>
+sentry fro production grade eror tracking 

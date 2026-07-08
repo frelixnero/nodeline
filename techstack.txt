@@ -1,6 +1,7 @@
 shadcn ui
 zod
 neon
+prisma
 tanstack/react query - 5.90.2
 trpc/client - 11.6.0
 trpc/server - 11.6.0
@@ -12,3 +13,4 @@ tweakcn -
 inngest - 3.44.1
 inngest cli - 1.12.1  npm run inngest:dev
 sentry
+polae 

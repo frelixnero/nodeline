@@ -57,7 +57,7 @@ export default function RegisterForm(){
                 name: derivedName,
                 email: values.email,
                 password: values.password,
-                callbackURL: '/',
+                callbackURL: '/workflows',
             });
 
             if (result?.error) {
@@ -66,7 +66,7 @@ export default function RegisterForm(){
             }
 
             toast.success("Account created successfully");
-            router.push('/');
+            router.replace('/workflows');
         } catch (error) {
             const message = error instanceof Error ? error.message : "Unable to create account";
             toast.error(message);

@@ -1,4 +1,5 @@
 import { auth } from '@/lib/auth';
+import { polarClient } from '@/lib/polar';
 import { initTRPC, TRPCError } from '@trpc/server';
 import { headers } from 'next/headers';
 import { cache } from 'react';
@@ -39,3 +40,44 @@ export const protectedProcedure = baseProcedure.use(async({ctx, next}) => {
 
     return next({ctx: {...ctx, auth: session}});
 })
+
+export const premiumProcedure = protectedProcedure.use(
+    async({ctx, next}) => {
+        let customer;
+        try {
+            customer = await polarClient.customers.getStateExternal({
+                externalId: ctx.auth.user.id,
+            });
+        } catch (error) {
+            const message = error instanceof Error ? error.message : String(error);
+            const isMissingCustomer =
+                message.includes("ResourceNotFound") ||
+                message.includes("Not found");
+
+            // Treat missing Polar customer as non-premium access for gated procedures.
+            if (isMissingCustomer) {
+                throw new TRPCError({
+                    code: "FORBIDDEN",
+                    message: "FORBIDDEN: You must have an active subscription to access this resource",
+                });
+            }
+
+            throw new TRPCError({
+                code: "INTERNAL_SERVER_ERROR",
+                message: "Failed to validate subscription status",
+                cause: error,
+            });
+        }
+
+        if (
+            !customer.activeSubscriptions ||
+            customer.activeSubscriptions.length === 0
+        ) {
+            throw new TRPCError({
+                code: "FORBIDDEN",
+                message: "FORBIDDEN: You must have an active subscription to access this resource",
+            });
+        }
+        return next({ctx: {...ctx, customer}});
+    },
+);

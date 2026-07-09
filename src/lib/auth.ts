@@ -5,9 +5,18 @@ import { prismaAdapter } from "better-auth/adapters/prisma";
 import {polarClient} from "./polar";
 
 const trustedOrigins = [
+    process.env.BETTER_AUTH_URL,
     "http://localhost:3000",
+    "http://localhost:3001",
+    "http://localhost:3002",
+    "http://localhost:3003",
     "http://127.0.0.1:3000",
-];
+    "http://127.0.0.1:3001",
+    "http://127.0.0.1:3002",
+    "http://127.0.0.1:3003",
+].filter((origin): origin is string => Boolean(origin));
+
+const shouldCreatePolarCustomerOnSignUp = process.env.NODE_ENV === "production";
 
 export const auth = betterAuth({
     secret: process.env.BETTER_AUTH_SECRET,
@@ -23,7 +32,7 @@ export const auth = betterAuth({
     plugins: [
         polar({
             client: polarClient,
-            createCustomerOnSignUp: true,
+            createCustomerOnSignUp: shouldCreatePolarCustomerOnSignUp,
             use: [
                 checkout({
                     products: [

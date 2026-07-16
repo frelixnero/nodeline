@@ -33,12 +33,11 @@ export const workFlowsRouter = createTRPCRouter({
         });
     }),
     getOne: protectedProcedure.input(z.object({id: z.string(), }))
-    .mutation(({ ctx, input }) => {
-        return prisma.workFLow.findUnique({
+    .query(({ ctx, input }) => {
+        return prisma.workFLow.findUniqueOrThrow({
             where: {
                 id: input.id, userId: ctx.auth.user.id
             },
-            
         });
     }),
     getMany: protectedProcedure.

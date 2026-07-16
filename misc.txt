@@ -21,3 +21,10 @@ extracting contents javascript and react
 to install cli npm install --save-dev --save-exact <package-name>@<version>
 sentry fro production grade eror tracking
 destructuring and promise using interface data types tp pass dynamic params to 
+hooks are used client side
+tanstack query + trpc + nuqs gives type safety, caching
+React.ReactNode means “this can be rendered.”That includes:
+a component element like <Button />, plain text like "Hello"
+ -numbers
+ - null
+ - arrays of renderable things

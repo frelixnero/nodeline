@@ -14,3 +14,5 @@ inngest - 3.44.1
 inngest cli - 1.12.1  npm run inngest:dev
 sentry
 polae 
+nuqs 2.7.1
+superjson 2.2.2

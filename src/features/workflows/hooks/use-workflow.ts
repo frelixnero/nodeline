@@ -3,10 +3,8 @@
 import { useTRPC } from "@/trpc/client";
 import { TRPCClientError } from "@trpc/client";
 import { useMutation, useQueryClient, useSuspenseQuery } from "@tanstack/react-query";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { useWorkflowsParams } from "./use-workflows-params";
-import { tr } from "date-fns/locale";
 
 export const useSuspenseWorkflows = () => {
     const trpc = useTRPC();
@@ -48,4 +46,34 @@ export const useRemoveWorkflow = () => {
             }
         })
     )
+}
+
+
+// Hook to fecth a single workflow
+export const useSuspenseWorkflow = (id: string) => {
+    const trpc = useTRPC();
+    return useSuspenseQuery(trpc.workflows.getOne.queryOptions({ id }));
+};
+
+
+// Hook to uodate name
+export  const useUpdateWorkflowName = () => {
+    const queryClient = useQueryClient();
+    const trpc = useTRPC();
+
+    return useMutation(trpc.workflows.updateName.mutationOptions({
+        onSuccess: (data) => {
+             toast.success(`Workflow "${data.name}" updated successfully`);  
+             queryClient.invalidateQueries(trpc.workflows.getMany.queryOptions({}),
+            
+            );
+            queryClient.invalidateQueries(trpc.workflows.getOne.queryOptions({ id: data.id }));
+        },
+        onError: (error) => {
+            if (error instanceof TRPCClientError && error.data?.code === "FORBIDDEN") {
+                return;
+            }
+            toast.error(`Failed to Update workflow: ${error.message}`);
+        }
+    }))
 }

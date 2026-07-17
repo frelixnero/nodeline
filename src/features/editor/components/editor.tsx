@@ -7,6 +7,19 @@ import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, type Node, type
 import { nodeComponents } from '@/config/node-components';
 import { AddNodeButton } from './add-node-button';
 
+const normalizeEdges = (edges: Edge[]): Edge[] => {
+    return edges.map((edge) => ({
+        id: edge.id,
+        source: edge.source,
+        target: edge.target,
+        sourceHandle: edge.sourceHandle,
+        targetHandle: edge.targetHandle,
+        type: edge.type,
+        data: edge.data,
+        animated: edge.animated,
+    }));
+};
+
 
 export const EditorLoading = () => {
     return <LoadingView message="Loading editor..." />;
@@ -23,7 +36,7 @@ export const Editor = ({workflowId}: {workflowId: string}) => {
     const { data: workflow } = useSuspenseWorkflow(workflowId);
 
     const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
-    const [edges, setEdges] = useState<Edge[]>(workflow.edges);
+    const [edges, setEdges] = useState<Edge[]>(normalizeEdges(workflow.edges as Edge[]));
 
     const onNodesChange = useCallback(
         (changes: NodeChange[]) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),

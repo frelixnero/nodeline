@@ -1,7 +1,7 @@
 shadcn ui
 zod
 neon
-prisma
+prisma  npx prisma migrate dev : to push changes in schema to the database
 tanstack/react query - 5.90.2
 trpc/client - 11.6.0
 trpc/server - 11.6.0

@@ -1,0 +1,110 @@
+
+> nodeline@0.1.0 build
+> next build --turbopack
+
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+   ▲ Next.js 15.5.4 (Turbopack)
+   - Environments: .env
+   - Experiments (use with caution):
+     · clientTraceMetadata
+
+   Creating an optimized production build ...
+[@sentry/nextjs] DEPRECATION WARNING: disableLogger is deprecated and will be removed in a future version. Use webpack.treeshake.removeDebugLogging instead. (Not supported with Turbopack.)
+[@sentry/nextjs] DEPRECATION WARNING: automaticVercelMonitors is deprecated and will be removed in a future version. Use webpack.automaticVercelMonitors instead. (Not supported with Turbopack.)
+ ✓ Finished writing to disk in 166ms
+Turbopack build encountered 10 warnings:
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package import-in-the-middle can't be external
+The request import-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (1.15.0) compared to the package requested from the importing module (3.3.0).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package import-in-the-middle can't be external
+The request import-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (1.15.0) compared to the package requested from the importing module (3.3.0).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package import-in-the-middle can't be external
+The request import-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (1.15.0) compared to the package requested from the importing module (3.3.0).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package import-in-the-middle can't be external
+The request import-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (1.15.0) compared to the package requested from the importing module (3.3.0).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/node-core/build/cjs/sdk
+Package import-in-the-middle can't be external
+The request import-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (1.15.0) compared to the package requested from the importing module (3.3.0).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/node-core/build/cjs/sdk
+Package import-in-the-middle can't be external
+The request import-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (1.15.0) compared to the package requested from the importing module (3.3.0).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package require-in-the-middle can't be external
+The request require-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (7.5.2) compared to the package requested from the importing module (8.0.1).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package require-in-the-middle can't be external
+The request require-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (7.5.2) compared to the package requested from the importing module (8.0.1).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package require-in-the-middle can't be external
+The request require-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (7.5.2) compared to the package requested from the importing module (8.0.1).
+Make sure to install the same version of the package in both locations.
+
+
+./node_modules/@sentry/nextjs/node_modules/@opentelemetry/instrumentation/build/esm/platform/node
+Package require-in-the-middle can't be external
+The request require-in-the-middle matches serverExternalPackages (or the default list).
+The package resolves to a different version when requested from the project directory (7.5.2) compared to the package requested from the importing module (8.0.1).
+Make sure to install the same version of the package in both locations.
+
+
+ ✓ Compiled successfully in 24.8s
+   Running next.config.js provided runAfterProductionCompile ...
+ ✓ Completed runAfterProductionCompile in 10352ms
+   Linting and checking validity of types ...
+Failed to compile.
+
+./src/features/editor/components/editor.tsx:26:48
+Type error: Argument of type '{ id: string; source: string; target: string; type?: string | undefined; data?: Record<string, unknown> | undefined; label?: string | number | boolean | { type: string; key: string | null; props?: unknown; $$typeof?: string | undefined; } | ... 4 more ... | undefined; ... 22 more ...; reconnectable?: boolean | ... 1...' is not assignable to parameter of type 'Edge[] | (() => Edge[])'.
+  Type '{ id: string; source: string; target: string; type?: string | undefined; data?: Record<string, unknown> | undefined; label?: string | number | boolean | { type: string; key: string | null; props?: unknown; $$typeof?: string | undefined; } | ... 4 more ... | undefined; ... 22 more ...; reconnectable?: boolean | ... 1...' is not assignable to type 'Edge[]'.
+    Type '{ id: string; source: string; target: string; type?: string | undefined; data?: Record<string, unknown> | undefined; label?: string | number | boolean | { type: string; key: string | null; props?: unknown; $$typeof?: string | undefined; } | ... 4 more ... | undefined; ... 22 more ...; reconnectable?: boolean | ... 1...' is not assignable to type 'Edge'.
+      Type '{ id: string; source: string; target: string; type?: string | undefined; data?: Record<string, unknown> | undefined; label?: string | number | boolean | { type: string; key: string | null; props?: unknown; $$typeof?: string | undefined; } | ... 4 more ... | undefined; ... 22 more ...; reconnectable?: boolean | ... 1...' is not assignable to type 'EdgeLabelOptions'.
+        Types of property 'label' are incompatible.
+          Type 'string | number | boolean | { type: string; key: string | null; props?: unknown; $$typeof?: string | undefined; } | {} | { type: string; key: string | null; props?: unknown; children?: string | number | boolean | ... 5 more ... | undefined; $$typeof?: string | undefined; } | Promise<...> | null | undefined' is not assignable to type 'ReactNode'.
+            Type '{ type: string; key: string | null; props?: unknown; $$typeof?: string | undefined; }' is not assignable to type 'ReactNode'.
+              Property 'children' is missing in type '{ type: string; key: string | null; props?: unknown; $$typeof?: string | undefined; }' but required in type 'ReactPortal'.
+
+[0m [90m 24 |[39m
+ [90m 25 |[39m     [36mconst[39m [nodes[33m,[39m setNodes] [33m=[39m useState[33m<[39m[33mNode[39m[][33m>[39m(workflow[33m.[39mnodes)[33m;[39m
+[31m[1m>[22m[39m[90m 26 |[39m     [36mconst[39m [edges[33m,[39m setEdges] [33m=[39m useState[33m<[39m[33mEdge[39m[][33m>[39m(workflow[33m.[39medges)[33m;[39m
+ [90m    |[39m                                                [31m[1m^[22m[39m
+ [90m 27 |[39m
+ [90m 28 |[39m     [36mconst[39m onNodesChange [33m=[39m useCallback(
+ [90m 29 |[39m         (changes[33m:[39m [33mNodeChange[39m[]) [33m=>[39m setNodes((nodesSnapshot) [33m=>[39m applyNodeChanges(changes[33m,[39m nodesSnapshot))[33m,[39m[0m
+Next.js build worker exited with code: 1 and signal: null

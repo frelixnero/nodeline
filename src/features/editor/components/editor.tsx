@@ -6,6 +6,8 @@ import { useSuspenseWorkflow } from "@/features/workflows/hooks/use-workflow";
 import { ReactFlow, applyNodeChanges, applyEdgeChanges, addEdge, type Node, type Edge, NodeChange, EdgeChange, Connection, Background, Controls, MiniMap, Panel } from '@xyflow/react';
 import { nodeComponents } from '@/config/node-components';
 import { AddNodeButton } from './add-node-button';
+import { useSetAtom } from 'jotai';
+import { editorAtom } from '../store/atoms';
 
 const normalizeEdges = (edges: Edge[]): Edge[] => {
     return edges.map((edge) => ({
@@ -35,6 +37,9 @@ export const EditorError = () => {
 export const Editor = ({workflowId}: {workflowId: string}) => {
     const { data: workflow } = useSuspenseWorkflow(workflowId);
 
+    const setEditorState = useSetAtom(editorAtom);
+
+
     const [nodes, setNodes] = useState<Node[]>(workflow.nodes);
     const [edges, setEdges] = useState<Edge[]>(normalizeEdges(workflow.edges as Edge[]));
 
@@ -60,7 +65,14 @@ export const Editor = ({workflowId}: {workflowId: string}) => {
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
             nodeTypes={nodeComponents}
+            onInit={setEditorState}
             fitView
+            snapToGrid
+            snapGrid={[10,10]}
+            selectionOnDrag
+            panOnScroll
+            panOnDrag={false}
+
             proOptions={{
                 hideAttribution: true
             }}

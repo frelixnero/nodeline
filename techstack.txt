@@ -16,3 +16,4 @@ sentry
 polae 
 nuqs 2.7.1
 superjson 2.2.2
+jotai 2.15.0

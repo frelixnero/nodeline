@@ -14,7 +14,18 @@ import {
 import { Input } from "@/components/ui/input";
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
-import { useSuspenseWorkflow, useUpdateWorkflowName } from "@/features/workflows/hooks/use-workflow";
+import { useSuspenseWorkflow, useUpdateWorkflow, useUpdateWorkflowName } from "@/features/workflows/hooks/use-workflow";
+import { useAtomValue } from "jotai";
+import { editorAtom } from "../store/atoms";
+import { NodeType } from "@/generated/prisma/browser";
+
+const isWorkflowNodeType = (type: string | undefined): type is NodeType => {
+    return (
+        type === NodeType.INITIAL ||
+        type === NodeType.MANUAL_TRIGGER ||
+        type === NodeType.HTTP_REQUEST
+    );
+};
 
 
 
@@ -110,11 +121,57 @@ export const EditorNameInput = ({workflowId}: { workflowId: string }) => {
 }
 
 export const EditorSaveButton = ({workflowId}: { workflowId: string }) => {
+    const editor = useAtomValue(editorAtom);
+    const  saveWorkflow = useUpdateWorkflow();
+
+    const handleSave = () => {
+        if (!editor){
+            return;
+        }
+
+        const nodes = editor.getNodes().reduce<
+            Array<{
+                id: string;
+                type: NodeType;
+                position: { x: number; y: number };
+                data?: Record<string, any>;
+            }>
+        >((acc, node) => {
+            if (!isWorkflowNodeType(node.type)) {
+                return acc;
+            }
+
+            acc.push({
+                id: node.id,
+                type: node.type,
+                position: node.position,
+                data: (node.data ?? {}) as Record<string, any>,
+            });
+
+            return acc;
+        }, []);
+
+        const edges = editor.getEdges().map((edge) => ({
+            source: edge.source,
+            target: edge.target,
+            sourceHandle: edge.sourceHandle,
+            targetHandle: edge.targetHandle,
+        }));
+
+        saveWorkflow.mutate({
+            id: workflowId,
+            nodes,
+            edges,
+        })
+    }
+
+    
+    
     return (
         <div className="ml-auto">
             <Button size="sm"
-             className="gap-2" onClick={() => {}}
-             disabled={false}
+             className="gap-2" onClick={handleSave}
+             disabled={saveWorkflow.isPending}
              >
                 <SaveIcon className="size-4"/>
                 Save

@@ -16,7 +16,8 @@ const trustedOrigins = [
     "http://127.0.0.1:3003",
 ].filter((origin): origin is string => Boolean(origin));
 
-const shouldCreatePolarCustomerOnSignUp = process.env.NODE_ENV === "production";
+const shouldCreatePolarCustomerOnSignUp =
+    process.env.POLAR_CREATE_CUSTOMER_ON_SIGNUP !== "false";
 
 export const auth = betterAuth({
     secret: process.env.BETTER_AUTH_SECRET,

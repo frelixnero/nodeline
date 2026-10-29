@@ -8,6 +8,7 @@ import { FormType, HTTPRequestDialog } from "./dialog";
  
 
 type HttpRequestNodeData = {
+    variableName?: string;
     endpoint?: string;
     method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
     body?: string;
@@ -32,6 +33,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
                     ...node, 
                     data: {
                         ...node.data,
+                        variableName: values.variableName,
                         endpoint: values.endpoint,
                         method: values.method,
                         body: values.body,
@@ -54,6 +56,7 @@ export const HttpRequestNode = memo((props: NodeProps<HttpRequestNodeType>) => {
         <HTTPRequestDialog open={dialogOpen} 
         onOpenChange={setDialogOpen}
         onSubmit={handleSubmit}
+        defaultVariableName={nodeData?.variableName || ""}
         defaultEndpoint={nodeData?.endpoint || ""}
         defaultMethod={nodeData?.method || "GET"}
         defaultBody={nodeData?.body || ""}

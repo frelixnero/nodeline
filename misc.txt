@@ -28,3 +28,10 @@ a component element like <Button />, plain text like "Hello"
  -numbers
  - null
  - arrays of renderable things
+
+ use memo to stop things from rerendering
+
+ Opted out using inngest inbuilt fetch method becuase its justa fetch wrapper
+ used ky instead
+
+https://jsonplaceholder.typicode.com/todos/1 

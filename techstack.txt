@@ -11,9 +11,16 @@ server only - 0.0.1
 better auth 1.3.26
 tweakcn - 
 inngest - 3.44.1
-inngest cli - 1.12.1  npm run inngest:dev
+inngest cli - 1.12.1  npx --package inngest-cli@1.12.1 inngest dev
 sentry
-polae 
+polar
 nuqs 2.7.1
 superjson 2.2.2
 jotai 2.15.0
+toposort to sort the nodes in topological order
+edege array for topo sort returns a matrix , why ?
+removing duplicates from self edges why
+also what is [... new Set()]
+the error instant is cyclic which means we can't create a linear sort from them why ?
+
+regex for string parsing in zod for node variable name

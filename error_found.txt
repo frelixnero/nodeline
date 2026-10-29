@@ -1,0 +1,18 @@
+Cause of the Error
+The error "failed to execute workflow: Unable to transform response from server" occurs 
+due to a mismatch in data transformation between the tRPC server and client:
+
+The server (src/trpc/init.ts) was configured with superjson as its data 
+transformer to serialize complex types (like Date objects returned by Prisma).
+The client (src/trpc/client.tsx) had superjson commented out (// transformer: superjson,), 
+preventing @trpc/client from deserializing the server's payload.
+Solution
+Updated 
+
+src/trpc/client.tsx
+ to import superjson and pass transformer: superjson into httpBatchLink.
+
+Executing workflows from the UI will now successfully parse and process server responses!
+
+
+1. Key Collision 

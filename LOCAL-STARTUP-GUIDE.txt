@@ -1,0 +1,4 @@
+Start up guide
+
+=== start by initializing the app with-------- npm run dev
+=== then spin up the inngest server with----- npm run inngest:dev

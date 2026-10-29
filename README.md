@@ -1,36 +1,75 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# nodeline
 
-## Getting Started
+A visual workflow editor and orchestrator — build, run and observe event-driven workflows with a modern Next.js UI and a Prisma-backed backend.
 
-First, run the development server:
+Elevator pitch: a developer-first workflow studio for creating and executing orchestrated flows (editor + executions + monitoring).
+
+## Key Features
+
+- Visual workflow editor using React Flow (drag, connect, edit nodes)
+- Realtime and async executions with Inngest-backed functions and background processing
+- tRPC API surface for frontend↔backend type-safe calls
+- PostgreSQL/Neon persistence via Prisma with full migrations
+- Auth, dashboards, and subscription workflows out of the box
+- Observability integrations (Sentry)
+
+## Architecture (high level)
+
+- Frontend: Next.js (app router) + TypeScript — UI components live in `src/components` and pages in `src/app`.
+- API & RPC: `src/trpc` exposes typed server routes consumed by the UI.
+- Workers / events: `src/inngest` contains client and function definitions powering async workflows.
+- Persistence: `prisma/schema.prisma` and the `prisma/migrations` folder manage the DB schema.
+- Utilities: DB helpers in `src/lib/db.ts`, auth helpers in `src/lib/auth-client.ts`.
+
+Notable files:
+
+- [prisma/schema.prisma](prisma/schema.prisma)
+- [src/app/(dashboard)](src/app/%28dashboard%29)
+- [src/components/react-flow](src/components/react-flow)
+- [src/trpc](src/trpc)
+- [src/inngest/client.ts](src/inngest/client.ts)
+
+## Quickstart (development)
+
+Prereqs: Node 18+ and your preferred package manager (npm / pnpm / yarn).
+
+1. Install dependencies
+
+```bash
+npm install
+```
+
+2. Prepare environment
+
+- Copy `.env.example` to `.env` and set your DB connection and any provider keys (Neon, Sentry, Inngest, auth secrets).
+
+3. Generate Prisma client & run migrations
+
+```bash
+npx prisma generate
+npx prisma migrate dev
+```
+
+4. Start the dev server
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open http://localhost:3000 and sign in to the dashboard to start creating workflows.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Deployment
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+This project deploys well to Vercel for the frontend; backend functions and long-running workers may require a dedicated runtime (e.g., serverless functions, dedicated worker host, or Inngest runner). Ensure environment variables and the database connection are configured in your deployment target.
 
-## Learn More
+## Contributing
 
-To learn more about Next.js, take a look at the following resources:
+Contributions, issues and suggestions are welcome. Please open a PR or issue and describe the change or bug. For architecture or design discussions, start an issue so we can align on goals.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## License
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Add a license or keep it private depending on your preference.
 
-## Deploy on Vercel
+---
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Need a shorter one-line pitch for README header or a more marketing-focused landing blurb? I can produce both variants.

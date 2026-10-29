@@ -9,7 +9,8 @@ export const useSubscription = () => {
             return data
         },
         staleTime: 5 * 60 * 1000,
-        refetchOnWindowFocus: false,
+        refetchOnWindowFocus: true,
+        refetchOnMount: true,
         retry: 1,
     })
 }

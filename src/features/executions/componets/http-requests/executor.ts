@@ -2,10 +2,20 @@ import type { NodeExecutor, NodeExecutorParams } from "@/features/executions/com
 import { contextFromJSON } from "@polar-sh/sdk/models/components/validationerror.js";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
+import Handlebars from "handlebars";
+
+Handlebars.registerHelper("json", (context) => {
+    const jsonStringified = JSON.stringify(context, null, 2);
+    const safestring = new Handlebars.SafeString(jsonStringified);
+
+     
+    return safestring;
+} );
+
 
 type HTTPRequestData = {
-    variableName?: string;
-    endpoint?: string;
+    variableName: string;
+    endpoint: string;
     method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
     body: string
 }
@@ -27,16 +37,25 @@ export const HTTPRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
         throw new NonRetriableError("HTTP Request Node: No variable name configured")
     }
 
+    if (!data.method) {
+        // publish error for htpp request
+        throw new NonRetriableError("HTTP Request Node: No method configured")
+    }
+
 
     const result = await step.run("http-request", async () => {
-        const endpoint = data.endpoint!;
+        const endpoint = Handlebars.compile(data.endpoint!)(context);
+        console.log("ENDPOINT", {endpoint})
+
         const method = data.method || "GET"
 
         const options: KyOptions = { method }
 
         if (["POST", "PUT", "PATCH"].includes(method)) {
             if (data.body) {
-                options.body = data.body;
+                const resolved = Handlebars.compile(data.body || "{}")(context);
+                JSON.parse(resolved)
+                options.body = resolved;
                 options.headers = {
                     "Content-Type": "application/json"
                 }
@@ -58,19 +77,14 @@ export const HTTPRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
             },   
         }
         
-        if (data.variableName){
-                return {
-                ...context,
-                [data.variableName]: responsePayload,
-            }
-        }
-
-        //  Fallback to direct http response in context if no variable name is provided
+       
         return {
             ...context,
-            ...responsePayload,
-            
+            [data.variableName]: responsePayload,
         }
+     
+
+        
     })
 
     // Publish success state for manual trigger

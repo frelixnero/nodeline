@@ -17,6 +17,7 @@ polar
 nuqs 2.7.1
 superjson 2.2.2
 jotai 2.15.0
+Added templating with Handle bars to pass context from one node to another
 toposort to sort the nodes in topological order
 edege array for topo sort returns a matrix , why ?
 removing duplicates from self edges why

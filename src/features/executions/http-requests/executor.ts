@@ -1,8 +1,8 @@
-import type { NodeExecutor, NodeExecutorParams } from "@/features/executions/componets/types";
-import { contextFromJSON } from "@polar-sh/sdk/models/components/validationerror.js";
+import type { NodeExecutor } from "@/features/executions/types";
 import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
 import Handlebars from "handlebars";
+import { httpRequestChannel } from "@/inngest/channels/http-request";
 
 Handlebars.registerHelper("json", (context) => {
     const jsonStringified = JSON.stringify(context, null, 2);
@@ -25,24 +25,52 @@ export const HTTPRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
     data,
     nodeId,
     context,
-    step
+    step,
+    publish,
 }) => {
+
+    await publish(
+        httpRequestChannel().status({
+            nodeId, 
+            status: "loading"
+        })
+    )
+
     if (!data.endpoint) {
         // publish error for htpp request
+        await publish(
+            httpRequestChannel().status({
+                nodeId, 
+                status: "error"
+            })
+        )
         throw new NonRetriableError("HTTP Request Node: No endpoint configured")
     }
 
     if (!data.variableName) {
         // publish error for htpp request
+        await publish(
+            httpRequestChannel().status({
+                nodeId, 
+                status: "error"
+            })
+        )
         throw new NonRetriableError("HTTP Request Node: No variable name configured")
     }
 
     if (!data.method) {
         // publish error for htpp request
+        await publish(
+            httpRequestChannel().status({
+                nodeId, 
+                status: "error"
+            })
+        )
         throw new NonRetriableError("HTTP Request Node: No method configured")
     }
 
 
+    try {
     const result = await step.run("http-request", async () => {
         const endpoint = Handlebars.compile(data.endpoint!)(context);
         console.log("ENDPOINT", {endpoint})
@@ -85,8 +113,21 @@ export const HTTPRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
      
 
         
-    })
-
-    // Publish success state for manual trigger
-    return result
+    });
+    await publish(
+        httpRequestChannel().status({
+            nodeId,
+            status: "success",
+        })
+    );
+    return result as Record<string, unknown>;
+    } catch (error) {
+        await publish(
+            httpRequestChannel().status({
+                nodeId,
+                status: "error",
+            })
+        );
+        throw error;
+    }
 }

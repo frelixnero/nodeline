@@ -30,6 +30,9 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
+# mprocs process logs
+.mprocs/
+
 # env files (can opt-in for committing if needed)
 .env*
 
@@ -51,3 +54,7 @@ next-env.d.ts
 techstack.txt
 error_found.txt
 features.txt
+
+
+# other
+google-form-trigger-script.ts

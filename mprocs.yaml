@@ -1,4 +1,9 @@
 procs:
-  inngest: cmd:["cmd.exe", "/c", "npm run inngest:dev"]
+  next:
+    cmd: ["node", "scripts/next-dev.mjs"]
 
-  next: cmd:["cmd.exe", "/c", "npm run dev"]
+  inngest:
+    cmd: ["cmd.exe", "/c", "npm run inngest:dev"]
+
+  ngrok:
+    cmd: ["cmd.exe", "/c", "npm run ngrok:dev"]

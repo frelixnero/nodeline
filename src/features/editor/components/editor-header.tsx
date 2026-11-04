@@ -23,7 +23,8 @@ const isWorkflowNodeType = (type: string | undefined): type is NodeType => {
     return (
         type === NodeType.INITIAL ||
         type === NodeType.MANUAL_TRIGGER ||
-        type === NodeType.HTTP_REQUEST
+        type === NodeType.HTTP_REQUEST ||
+        type === NodeType.GOOGLE_FORM_TRIGGER
     );
 };
 

@@ -8,9 +8,10 @@
     "start": "next start",
     "postinstall": "prisma generate",
     "lint": "biome check",
+    "ngrok:dev": "node scripts/ngrok-dev.mjs",
     "format": "biome format --write",
-    "inngest:dev": "inngest-cli dev",
-    "dev:all": "mprocs"
+    "inngest:dev": "inngest-cli dev -u http://localhost:3000/api/inngest",
+    "dev:all": "mprocs --log-dir=.mprocs/logs"
   },
   "dependencies": {
     "@ai-sdk/google": "2.0.17",
@@ -69,7 +70,9 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/toposort": "^2.0.7",
+    "dotenv-cli": "^11.1.0",
     "inngest-cli": "^1.49.0",
+    "mprocs": "^0.9.6",
     "prisma": "^6.16.3",
     "shadcn": "^4.12.0",
     "tailwindcss": "^4",

@@ -2,6 +2,7 @@ import toposort from "toposort";
 import type { Node } from "@xyflow/react";
 import { Connection } from "@/generated/prisma/client";
 import { boolean } from "zod";
+import { inngest } from "./client";
 
 export const topologicalSort = <T extends { id: string }>(
     nodes: T[],
@@ -50,3 +51,13 @@ export const topologicalSort = <T extends { id: string }>(
 
     return sortedNodeIds.map((id) => nodeMap.get(id)!).filter(Boolean)
 }   
+
+export const sendWorkflowExecution = async ( data: {
+    workflowId: string;
+    [key: string]: any;
+}) => {
+    return inngest.send({
+        name: "workflow/execute.workflow",
+        data,
+    });
+}

@@ -6,6 +6,7 @@ import { TRPCError } from "@trpc/server";
 import z from "zod";
 import type { Node, Edge } from "@xyflow/react";
 import { inngest } from "@/inngest/client";
+import { sendWorkflowExecution } from "@/inngest/utils";
 
 export const workFlowsRouter = createTRPCRouter({
     execute: protectedProcedure
@@ -20,11 +21,11 @@ export const workFlowsRouter = createTRPCRouter({
                 }
             });
 
-            await inngest.send({
-                name: "workflow/execute.workflow",
-                data: { workflowId: input.id, }
+            await sendWorkflowExecution({
+                workflowId: input.id,
 
             })
+
             return workflow;
         }),
     create: premiumProcedure.mutation(({ ctx }) => {

@@ -43,7 +43,16 @@ const triggerNodes: NodeTypeOption[] = [
         label: "Google Form Trigger",
         description: "Trigger workflow when a Google Form is submitted",
         icon: "/googleform.svg",
-    }
+    },
+
+    {
+        type: NodeType.STRIPE_TRIGGER,
+        label: "Stripe Event",
+        description: "Trigger workflow when stripe events occur",
+        icon: "/logos/stripe.svg",
+    },
+     
+
 ]
 
 
@@ -53,6 +62,27 @@ const executionNodes: NodeTypeOption[] = [
         label: "HTTP Request",
         description: "Send a HTTP request to an external API",
         icon: Globe2Icon,
+    },
+    
+    {
+        type: NodeType.GEMINI,
+        label: "Gemini",
+        description: "Use google gemini to generate text, images, and more",
+        icon: "/logos/gemini.svg",
+    },
+
+    {
+        type: NodeType.OPENAI,
+        label: "OpenAI",
+        description: "Use openai models to generate text, images, and more",
+        icon: "/logos/openai.svg",
+    },
+
+    {
+        type: NodeType.ANTHROPIC,
+        label: "ANTHROPIC",
+        description: "Use anthropic models to generate text, images, and more",
+        icon: "/logos/anthropic.svg",
     }
 ]
 

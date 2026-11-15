@@ -3,12 +3,20 @@ import { NodeExecutor } from "../types";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-triggers/executor";
 import { HTTPRequestExecutor } from "../http-requests/executor";
 import { googleFormTriggerExecutor } from "@/features/triggers/components/google-form-trigger/executor";
+import { geminiExecutor } from "../gemini/executor";
+import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
+import { openAIExecutor } from "../openai/executor";
+import { AnthropicExecutor } from "../anthropic/executor";
 
 export const executorRegistry: Record<NodeType, NodeExecutor> = {
     [NodeType.MANUAL_TRIGGER]: manualTriggerExecutor,
     [NodeType.HTTP_REQUEST]: HTTPRequestExecutor,
     [NodeType.INITIAL]: manualTriggerExecutor,
     [NodeType.GOOGLE_FORM_TRIGGER]: googleFormTriggerExecutor,
+    [NodeType.STRIPE_TRIGGER]: stripeTriggerExecutor   , // Placeholder executor for Stripe Trigger
+    [NodeType.GEMINI]: geminiExecutor, // Placeholder executor for Gemini
+    [NodeType.ANTHROPIC]: AnthropicExecutor, // Placeholder executor for Anthropic
+    [NodeType.OPENAI]: openAIExecutor,
 }
 
 

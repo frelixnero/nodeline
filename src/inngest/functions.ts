@@ -1,5 +1,5 @@
 // src/inngest/functions.ts
-import { NonRetriableError } from "inngest";
+import { anthropic, NonRetriableError } from "inngest";
 import { inngest } from "./client";
 import { generateText } from "ai";
 import prisma from "@/lib/db";
@@ -9,6 +9,10 @@ import { getExecutor } from "@/features/executions/lib/executor-regitstry";
 import { httpRequestChannel } from "./channels/http-request";
 import { manualTriggerChannel } from "./channels/manual-trigger";
 import { googleFormTriggerChannel } from "./channels/google-form-trigger";
+import { stripeTriggerChannel } from "./channels/stripe-trigger";
+import { geminiChannel } from "./channels/gemini";
+import { openAIChannel } from "./channels/openai";
+import { AnthropicChannel } from "./channels/anthropic";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
@@ -17,7 +21,11 @@ export const executeWorkflow = inngest.createFunction(
     channels: [
       httpRequestChannel(),
       manualTriggerChannel(),
-      googleFormTriggerChannel()
+      googleFormTriggerChannel(),
+      stripeTriggerChannel(),
+      geminiChannel(),
+      openAIChannel(),
+      AnthropicChannel(),
     ],
   },
   async ({ event, step, publish}) => {

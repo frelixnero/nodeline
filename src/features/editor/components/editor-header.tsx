@@ -19,13 +19,10 @@ import { useAtomValue } from "jotai";
 import { editorAtom } from "../store/atoms";
 import { NodeType } from "@/generated/prisma/browser";
 
+const WORKFLOW_NODE_TYPES = new Set<string>(Object.values(NodeType));
+
 const isWorkflowNodeType = (type: string | undefined): type is NodeType => {
-    return (
-        type === NodeType.INITIAL ||
-        type === NodeType.MANUAL_TRIGGER ||
-        type === NodeType.HTTP_REQUEST ||
-        type === NodeType.GOOGLE_FORM_TRIGGER
-    );
+    return typeof type === "string" && WORKFLOW_NODE_TYPES.has(type);
 };
 
 
@@ -152,12 +149,16 @@ export const EditorSaveButton = ({workflowId}: { workflowId: string }) => {
             return acc;
         }, []);
 
-        const edges = editor.getEdges().map((edge) => ({
-            source: edge.source,
-            target: edge.target,
-            sourceHandle: edge.sourceHandle,
-            targetHandle: edge.targetHandle,
-        }));
+        const nodeIds = new Set(nodes.map((node) => node.id));
+        const edges = editor
+            .getEdges()
+            .filter((edge) => nodeIds.has(edge.source) && nodeIds.has(edge.target))
+            .map((edge) => ({
+                source: edge.source,
+                target: edge.target,
+                sourceHandle: edge.sourceHandle,
+                targetHandle: edge.targetHandle,
+            }));
 
         saveWorkflow.mutate({
             id: workflowId,

@@ -4,6 +4,11 @@ import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import Handlebars from "handlebars";
 import { geminiChannel } from "@/inngest/channels/gemini";
 import { generateText } from "ai";
+import prisma from "@/lib/db";
+import {
+    AI_REQUEST_TIMEOUT_MS,
+    toNonRetriableError,
+} from "@/features/executions/lib/ai-errors";
 
 Handlebars.registerHelper("json", (context) => {
     const jsonStringified = JSON.stringify(context, null, 2);
@@ -12,11 +17,12 @@ Handlebars.registerHelper("json", (context) => {
      
     return safestring;
 } );
-
+ 
 
 type GeminiData = {
     variableName?: string;
     model?: string;
+    credentialId: string;
     systemPrompt?: string;
     userPrompt?: string;
 }
@@ -47,6 +53,16 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
         throw new NonRetriableError("Gemini Node: Variable Name is missing ")
     }
 
+    if (!data.credentialId) {
+        await publish (
+            geminiChannel().status({
+                nodeId,
+                status: "error"
+            })
+        );
+        throw new NonRetriableError("Gemini Node: Credential is missing ")
+    }
+
     if (!data.userPrompt) {
         await publish(
             geminiChannel().status({
@@ -64,22 +80,45 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
 
     const userPrompt = Handlebars.compile(data.userPrompt)(context)
 
+    const credential = await step.run(`get-credential-${nodeId}`, () => {
+        return prisma.credential.findUnique({
+            where: {
+                id: data.credentialId
+            }
+        })
+    })
+
+    if (!credential) {
+        throw new NonRetriableError("Gemini node: Credential not found")
+    }
+
+
     // fecth credential that user selected
-    const credentialValue = process.env.GOOGLE_GENERATIVE_AI_API_KEY
     
     const google = createGoogleGenerativeAI({
-        apiKey: credentialValue,
+        apiKey: credential.value,
 
     });
 
     try {
         const { steps } = await step.ai.wrap(
-            "gemini-generate-text",
-            generateText,
+            `gemini-generate-text-${nodeId}`,
+            async (args: Parameters<typeof generateText>[0]) => {
+                try {
+                    return await generateText({
+                        ...args,
+                        abortSignal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
+                    });
+                } catch (error) {
+                    // Throw inside the step so Inngest does not retry permanent errors.
+                    throw toNonRetriableError(error);
+                }
+            },
             {
-                model: google(data.model ||  "gemini-2.5-flash"),
+                model: google(data.model || "gemini-3.5-flash-lite"),
                 system: systemPrompt,
                 prompt: userPrompt,
+                maxRetries: 0,
                 experimental_telemetry: {
                     isEnabled: true,
                     recordInputs: true,
@@ -112,6 +151,6 @@ export const geminiExecutor: NodeExecutor<GeminiData> = async ({
                 status: `error`
             })
         );
-        throw e;
+        throw toNonRetriableError(e);
     }
 }

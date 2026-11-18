@@ -1,10 +1,14 @@
 import type { NodeExecutor } from "@/features/executions/types";
-import { anthropic, NonRetriableError } from "inngest";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
-import { createOpenAI } from "@ai-sdk/openai";
-import Handlebars from "handlebars";import { generateText, modelMessageSchema } from "ai";
-import { openAIChannel } from "@/inngest/channels/openai";
+import { NonRetriableError } from "inngest";
+import { createAnthropic } from "@ai-sdk/anthropic";
+import Handlebars from "handlebars";
+import { generateText } from "ai";
 import { AnthropicChannel } from "@/inngest/channels/anthropic";
+import {
+    AI_REQUEST_TIMEOUT_MS,
+    toNonRetriableError,
+} from "@/features/executions/lib/ai-errors";
+import prisma from "@/lib/db";
 
 Handlebars.registerHelper("json", (context) => {
     const jsonStringified = JSON.stringify(context, null, 2);
@@ -18,6 +22,7 @@ Handlebars.registerHelper("json", (context) => {
 type AnthropicData = {
     variableName?: string;
     model?: string;
+    credentialId: string;
     systemPrompt?: string;
     userPrompt?: string;
 }
@@ -45,17 +50,28 @@ export const AnthropicExecutor: NodeExecutor<AnthropicData> = async ({
                 status: "error"
             })
         );
-        throw new NonRetriableError("OpenAI node: Variable Name is missing ")
+        throw new NonRetriableError("Anthropic node: Variable Name is missing ")
     }
+
+    if (!data.credentialId) {
+            await publish (
+                AnthropicChannel().status({
+                    nodeId,
+                    status: "error"
+                })
+            );
+            throw new NonRetriableError("Anthropic Node: Credential is missing ")
+        }
+    
 
     if (!data.userPrompt) {
         await publish(
-            openAIChannel().status({
+            AnthropicChannel().status({
                 nodeId,
                 status: "error"
             })
         );
-        throw new NonRetriableError("OpenAI Node: User Prompt is missing")
+        throw new NonRetriableError("Anthropic Node: User Prompt is missing")
     }
 
     const systemPrompt = data.systemPrompt 
@@ -65,22 +81,50 @@ export const AnthropicExecutor: NodeExecutor<AnthropicData> = async ({
 
     const userPrompt = Handlebars.compile(data.userPrompt)(context)
 
-    // fecth credential that user selected
-    const credentialValue = process.env.ANTHROPIC_API_KEY
-    
-    const openai = createOpenAI({
-        apiKey: credentialValue,
+    const credential = await step.run(`get-credential-${nodeId}`, () => {
+        return prisma.credential.findUnique({
+            where: {
+                id: data.credentialId
+            }
+        })
+    })
 
+    if (!credential) {
+        await publish(
+            AnthropicChannel().status({
+                nodeId,
+                status: "error"
+            })
+        );
+        throw new NonRetriableError("Anthropic node: Credential not found")
+    }
+    
+
+    const anthropic = createAnthropic({
+        apiKey: credential.value,
     });
 
     try {
+        const model = anthropic(data.model || "claude-sonnet-4-5");
+
         const { steps } = await step.ai.wrap(
-            "anthropic-generate-text",
-            generateText,
+            `anthropic-generate-text-${nodeId}`,
+            async (args: Parameters<typeof generateText>[0]) => {
+                try {
+                    return await generateText({
+                        ...args,
+                        abortSignal: AbortSignal.timeout(AI_REQUEST_TIMEOUT_MS),
+                    });
+                } catch (error) {
+                    // Throw inside the step so Inngest does not retry permanent errors.
+                    throw toNonRetriableError(error);
+                }
+            },
             {
-                model: "anthropic/claude-sonnet-5.5",
+                model,
                 system: systemPrompt,
                 prompt: userPrompt,
+                maxRetries: 0,
                 experimental_telemetry: {
                     isEnabled: true,
                     recordInputs: true,
@@ -94,7 +138,7 @@ export const AnthropicExecutor: NodeExecutor<AnthropicData> = async ({
                 ? steps[0].content[0].text 
                 : ""
         await publish(
-           openAIChannel().status({
+           AnthropicChannel().status({
                 nodeId,
                 status: "success"
             })
@@ -108,11 +152,11 @@ export const AnthropicExecutor: NodeExecutor<AnthropicData> = async ({
         }
     } catch (e) {
         await publish(
-            openAIChannel().status({
+            AnthropicChannel().status({
                 nodeId,
                 status: `error`
             })
         );
-        throw e;
+        throw toNonRetriableError(e);
     }
 }

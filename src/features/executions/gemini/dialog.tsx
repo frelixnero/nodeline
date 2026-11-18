@@ -31,15 +31,24 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { CredentialType } from "@/generated/prisma/enums";
+import { useCredentialsType } from "@/features/credentials/hooks/use-credentials";
+import Image from "next/image";
+
 
 const AVAILABLE_MODELS = [
-  "gemini-2.5-flash",
-  "gemini-3.1-pro",
+  "gemini-3.8-flash",
+  "gemini-3.7-flash",
+  "gemini-3.6-flash",
   "gemini-3.5-flash",
   "gemini-3.5-flash-lite",
-  "gemini-3.6-flash",
-  "gemini-3.6-flash-lite",
+  "gemini-3.1-flash-lite",
+  "gemini-2.5-flash",
 ] as const;
+
+// The faster "flash-lite" model avoids the multi-minute waits that the
+// larger thinking models can have on short prompts.
+const DEFAULT_MODEL = "gemini-3.5-flash-lite";
 
 const formSchema = z.object({
   variableName: z
@@ -50,6 +59,7 @@ const formSchema = z.object({
         "Variable name must start with a letter or underscore and can only contain letters, numbers, and underscores.",
     }),
   model: z.enum(AVAILABLE_MODELS),
+  credentialId: z.string().min(1, "Credential is required"),
   systemPrompt: z.string().optional(),
   userPrompt: z.string().min(1, { message: "User Prompt is required" }),
 });
@@ -71,11 +81,18 @@ export const GeminiDialog = ({
   defaultValues = {},
   defaultVariableName = "",
 }: GeminiDialogProps) => {
+  const {  
+
+    data: credentials, 
+    isLoading: isLoadingCredentials
+  } = useCredentialsType(CredentialType.GEMINI)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      credentialId: defaultValues.credentialId || "",
       variableName: defaultValues.variableName || defaultVariableName,
-      model: defaultValues.model || AVAILABLE_MODELS[0],
+      model: defaultValues.model || DEFAULT_MODEL,
       systemPrompt: defaultValues.systemPrompt || "",
       userPrompt: defaultValues.userPrompt || "",
     },
@@ -84,8 +101,9 @@ export const GeminiDialog = ({
   useEffect(() => {
     if (open) {
       form.reset({
+        credentialId: defaultValues.credentialId || "",
         variableName: defaultValues.variableName || defaultVariableName,
-        model: defaultValues.model || AVAILABLE_MODELS[0],
+        model: defaultValues.model || DEFAULT_MODEL,
         systemPrompt: defaultValues.systemPrompt || "",
         userPrompt: defaultValues.userPrompt || "",
       });
@@ -93,6 +111,7 @@ export const GeminiDialog = ({
   }, [
     open,
     defaultVariableName,
+    defaultValues.credentialId,
     defaultValues.variableName,
     defaultValues.model,
     defaultValues.systemPrompt,
@@ -137,6 +156,47 @@ export const GeminiDialog = ({
                   </FormDescription>
                   <FormMessage />
                 </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="credentialId"
+              render={({field}) => (
+                  <FormItem>
+                      <FormLabel>Gemini Credential</FormLabel>
+                      <Select
+                      onValueChange={field.onChange}
+                      value={field.value}
+                      disabled={isLoadingCredentials
+                        || !credentials?.length
+                      }
+                      >
+                        <FormControl>
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Select a credential"/>
+                            </SelectTrigger>
+                        </FormControl>   
+                        <SelectContent>
+                            {credentials?.map((credential) => 
+                                <SelectItem
+                                key={credential.id}
+                                value={credential.id}
+                                >
+                                  <div className="flex items-center gap-2">
+                                      <Image
+                                      src="/logos/gemini.svg"
+                                      alt="Gemini"
+                                      width={16}
+                                      height={16}
+                                      /> 
+                                      {credential.name}                                                   
+                                  </div>
+                                </SelectItem>
+                            )}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage/>
+                  </FormItem>
               )}
             />
             <FormField

@@ -75,9 +75,9 @@ export const EntityHeader = ({
                     size="sm"  
                     asChild>
                     <Link href={newButtonHref} prefetch>
+                        <PlusIcon className="size-4"/>
+                        {newButtonLabel}
                     </Link>
-                    <PlusIcon className="size-4"/>
-                    {newButtonLabel}
                 </Button>
             )}
         </div>

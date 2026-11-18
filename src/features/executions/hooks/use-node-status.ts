@@ -37,28 +37,28 @@ export function useNodeStatus({
         if (!data?.length){
             return;
         }
-        const latestMessage = data
-        .filter(
-            (msg) => 
-                msg.kind === "data" &&
-                msg.channel === channel &&
-                msg.topic === topic &&
-                msg.data.nodeId === nodeId, 
-        )
-        .sort(
-            (a,b) => {
-                if (a.kind === "data" && b.kind === "data") {
-                    return (
-                        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
 
-                    );
-                }
-                return 0;
+        // `data` arrives in chronological order, so the last matching message
+        // is the newest one. Relying on a timestamp sort here is unreliable:
+        // `loading` and `error` can share the same millisecond, and a stable
+        // sort would then keep the older `loading` message first.
+        let latestStatus: NodeStatus | undefined;
+
+        for (const message of data) {
+            if (
+                message.kind !== "data" ||
+                message.channel !== channel ||
+                message.topic !== topic ||
+                message.data.nodeId !== nodeId
+            ) {
+                continue;
             }
-        )[0]
 
-        if (latestMessage?.kind === "data") {
-            setStatus(latestMessage.data.status as NodeStatus);
+            latestStatus = message.data.status as NodeStatus;
+        }
+
+        if (latestStatus) {
+            setStatus(latestStatus);
         }
      }, [data, nodeId, channel, topic]);
 

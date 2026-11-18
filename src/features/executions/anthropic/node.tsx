@@ -10,6 +10,7 @@ import { AnthropicDialog, AnthropicFormValues,} from "./dialog";
 
 type AnthropicNodeData = {
   variableName?: string;
+  credentialId: string;
   model?: AnthropicFormValues["model"];
   systemPrompt?: string;
   userPrompt?: string;
@@ -32,6 +33,7 @@ export const AnthropicNode = memo((props: NodeProps<AnthropicNodeType>) => {
             data: {
               ...node.data,
               variableName: values.variableName,
+              credentialId: values.credentialId,
               model: values.model,
               systemPrompt: values.systemPrompt,
               userPrompt: values.userPrompt,
@@ -52,7 +54,7 @@ export const AnthropicNode = memo((props: NodeProps<AnthropicNodeType>) => {
 
   const nodeData = props.data as AnthropicNodeData;
   const description = nodeData?.userPrompt 
-    ? `claude-sonnet-4-5: ${nodeData.userPrompt.slice(0,50)}...`
+    ? `${nodeData.model || "claude-sonnet-4-5"}: ${nodeData.userPrompt.slice(0,50)}...`
     : "Not Configured";
 
   return (

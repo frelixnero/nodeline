@@ -1,7 +1,6 @@
 // src/inngest/functions.ts
-import { anthropic, NonRetriableError } from "inngest";
+import { NonRetriableError } from "inngest";
 import { inngest } from "./client";
-import { generateText } from "ai";
 import prisma from "@/lib/db";
 import { topologicalSort } from "./utils";
 import { NodeType } from "@/generated/prisma/enums";

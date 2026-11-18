@@ -11,6 +11,7 @@ import { OpenAIDialog, OpenAIFormValues } from "./dialog";
 type OpenAINodeData = {
   variableName?: string;
   model?: OpenAIFormValues["model"];
+  credentialId: string;
   systemPrompt?: string;
   userPrompt?: string;
 };
@@ -32,6 +33,7 @@ export const OpenAINode = memo((props: NodeProps<OpenAINodeType>) => {
             data: {
               ...node.data,
               variableName: values.variableName,
+              credentialId: values.credentialId,
               model: values.model,
               systemPrompt: values.systemPrompt,
               userPrompt: values.userPrompt,
@@ -52,7 +54,7 @@ export const OpenAINode = memo((props: NodeProps<OpenAINodeType>) => {
 
   const nodeData = props.data as OpenAINodeData;
   const description = nodeData?.userPrompt 
-    ? `gpt-4.1: ${nodeData.userPrompt.slice(0,50)}...`
+    ? `${nodeData.model || "gpt-4.1-mini"}: ${nodeData.userPrompt.slice(0,50)}...`
     : "Not Configured";
 
   return (

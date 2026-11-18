@@ -14,9 +14,9 @@
     "dev:all": "mprocs --log-dir=.mprocs/logs"
   },
   "dependencies": {
-    "@ai-sdk/anthropic": "^4.0.103",
+    "@ai-sdk/anthropic": "^2.0.115",
     "@ai-sdk/google": "2.0.17",
-    "@ai-sdk/openai": "^4.0.116",
+    "@ai-sdk/openai": "^2.0.143",
     "@base-ui/react": "^1.6.0",
     "@hookform/resolvers": "^5.4.0",
     "@inngest/realtime": "^0.4.6",

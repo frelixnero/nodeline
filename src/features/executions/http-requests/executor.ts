@@ -3,6 +3,7 @@ import { NonRetriableError } from "inngest";
 import ky, { type Options as KyOptions } from "ky";
 import Handlebars from "handlebars";
 import { httpRequestChannel } from "@/inngest/channels/http-request";
+import { toNonRetriableError } from "@/features/executions/lib/ai-errors";
 
 Handlebars.registerHelper("json", (context) => {
     const jsonStringified = JSON.stringify(context, null, 2);
@@ -71,7 +72,7 @@ export const HTTPRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
 
 
     try {
-    const result = await step.run("http-request", async () => {
+    const result = await step.run(`http-request-${nodeId}`, async () => {
         const endpoint = Handlebars.compile(data.endpoint!)(context);
         console.log("ENDPOINT", {endpoint})
 
@@ -128,6 +129,6 @@ export const HTTPRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
                 status: "error",
             })
         );
-        throw error;
+        throw toNonRetriableError(error);
     }
 }

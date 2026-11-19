@@ -12,6 +12,9 @@ import { stripeTriggerChannel } from "./channels/stripe-trigger";
 import { geminiChannel } from "./channels/gemini";
 import { openAIChannel } from "./channels/openai";
 import { AnthropicChannel } from "./channels/anthropic";
+import { discordChannel } from "./channels/discord";
+import { slack } from "better-auth";
+import { slackChannel } from "./channels/slack";
 
 export const executeWorkflow = inngest.createFunction(
   { id: "execute-workflow" },
@@ -25,6 +28,8 @@ export const executeWorkflow = inngest.createFunction(
       geminiChannel(),
       openAIChannel(),
       AnthropicChannel(),
+      discordChannel(),
+      slackChannel(),
     ],
   },
   async ({ event, step, publish}) => {
@@ -50,6 +55,18 @@ export const executeWorkflow = inngest.createFunction(
       return topologicalSort(workflow.nodes, workflow.connections);
     });
 
+    const userId =  await step.run("find-user-id", async () => {
+      const workflow = await prisma.workFLow.findUniqueOrThrow({
+        where: { id: workflowId},
+        select: {
+          userId: true,
+
+        }
+        
+      });
+      return workflow.userId;
+    })
+
     // Initialize context with any initail data from the trigger
     let context = event.data.initialData || {}
 
@@ -59,6 +76,7 @@ export const executeWorkflow = inngest.createFunction(
       context = await executor({
         data: node.data as Record<string, unknown>,
         context,
+        userId,
         nodeId: node.id,
         step,
         publish,

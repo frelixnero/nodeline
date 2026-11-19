@@ -1,4 +1,5 @@
 import { NodeType } from "@/generated/prisma/enums";
+import { NonRetriableError } from "inngest";
 import { NodeExecutor } from "../types";
 import { manualTriggerExecutor } from "@/features/triggers/components/manual-triggers/executor";
 import { HTTPRequestExecutor } from "../http-requests/executor";
@@ -7,6 +8,8 @@ import { geminiExecutor } from "../gemini/executor";
 import { stripeTriggerExecutor } from "@/features/triggers/components/stripe-trigger/executor";
 import { openAIExecutor } from "../openai/executor";
 import { AnthropicExecutor } from "../anthropic/executor";
+import { DiscordExecutor } from "../discord/executor";
+import { SlackExecutor } from "../slack/executor";
 
 export const executorRegistry: Record<NodeType, NodeExecutor> = {
     [NodeType.MANUAL_TRIGGER]: manualTriggerExecutor,
@@ -17,6 +20,9 @@ export const executorRegistry: Record<NodeType, NodeExecutor> = {
     [NodeType.GEMINI]: geminiExecutor, // Placeholder executor for Gemini
     [NodeType.ANTHROPIC]: AnthropicExecutor, // Placeholder executor for Anthropic
     [NodeType.OPENAI]: openAIExecutor,
+    [NodeType.DISCORD]: DiscordExecutor,
+    [NodeType.SLACK]: SlackExecutor,
+    
 }
 
 

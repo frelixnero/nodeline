@@ -73,47 +73,52 @@ export const HTTPRequestExecutor: NodeExecutor<HTTPRequestData> = async ({
 
     try {
     const result = await step.run(`http-request-${nodeId}`, async () => {
-        const endpoint = Handlebars.compile(data.endpoint!)(context);
-        console.log("ENDPOINT", {endpoint})
+        try {
+            const endpoint = Handlebars.compile(data.endpoint!)(context);
+            console.log("ENDPOINT", {endpoint})
 
-        const method = data.method || "GET"
+            const method = data.method || "GET"
 
-        const options: KyOptions = { method }
+            const options: KyOptions = { method }
 
-        if (["POST", "PUT", "PATCH"].includes(method)) {
-            if (data.body) {
-                const resolved = Handlebars.compile(data.body || "{}")(context);
-                JSON.parse(resolved)
-                options.body = resolved;
-                options.headers = {
-                    "Content-Type": "application/json"
+            if (["POST", "PUT", "PATCH"].includes(method)) {
+                if (data.body) {
+                    const resolved = Handlebars.compile(data.body || "{}")(context);
+                    JSON.parse(resolved)
+                    options.body = resolved;
+                    options.headers = {
+                        "Content-Type": "application/json"
+                    }
                 }
+            } 
+
+            const response = await ky(endpoint, options)
+            const contentType = response.headers.get("content-type") || ""
+            const responseData = contentType?.includes("application/json")
+                ? await response.json()
+                : await response.text();
+
+            const responsePayload = {
+                httpResponse: {
+                    status: response.status,
+                    statusText: response.statusText,
+                    data: responseData,
+
+                },   
             }
-        } 
-
-        const response = await ky(endpoint, options)
-        const contentType = response.headers.get("content-type") || ""
-        const responseData = contentType?.includes("application/json")
-            ? await response.json()
-            : await response.text();
-
-        const responsePayload = {
-            httpResponse: {
-                status: response.status,
-                statusText: response.statusText,
-                data: responseData,
-
-            },   
-        }
+            
         
-       
-        return {
-            ...context,
-            [data.variableName]: responsePayload,
+            return {
+                ...context,
+                [data.variableName]: responsePayload,
+            }
+        } catch (error) {
+            // Convert inside the step so Inngest records a non-retriable
+            // failure and does not retry permanent errors (bad URL/JSON, 4xx).
+            throw toNonRetriableError(error);
         }
-     
 
-        
+         
     });
     await publish(
         httpRequestChannel().status({

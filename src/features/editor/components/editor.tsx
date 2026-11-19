@@ -54,7 +54,12 @@ export const Editor = ({workflowId}: {workflowId: string}) => {
         [],
     );
     const onConnect = useCallback(
-        (params: Connection) => setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
+        (params: Connection) => {
+            if (!params.source || !params.target || params.source === params.target) {
+                return;
+            }
+            setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot));
+        },
         [],
     );
 

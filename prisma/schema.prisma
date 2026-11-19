@@ -117,6 +117,8 @@ enum NodeType {
   GEMINI
   ANTHROPIC
   OPENAI
+  DISCORD
+  SLACK
 }
 model Node { 
   id   String @id @default(cuid())

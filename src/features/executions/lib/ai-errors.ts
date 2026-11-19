@@ -112,8 +112,27 @@ export function toNonRetriableError(error: unknown): unknown {
     return err;
   }
 
+  // ky (v2) throws a plain TypeError when the URL is malformed, which is a
+  // permanent config error. A real network failure surfaces as a
+  // `NetworkError` instead and should still be retried, so only the URL-parse
+  // message is matched here.
+  if (err.name === "TypeError" && /failed to parse url/i.test(err.message)) {
+    return new NonRetriableError(`Invalid URL: ${err.message}`, { cause: err });
+  }
+
   if (PERMANENT_AI_ERROR_NAMES.has(err.name)) {
     return new NonRetriableError(err.message, { cause: err });
+  }
+
+  // Inngest wraps step failures (e.g. in a `StepError`) with the original
+  // error in `cause`. If the wrapper itself isn't recognizable, classify its
+  // cause instead so the real failure (bad URL, bad key, etc.) still stops
+  // retries.
+  if (err.cause !== undefined && err.cause !== err) {
+    const causeResult = toNonRetriableError(err.cause);
+    if (causeResult instanceof NonRetriableError) {
+      return causeResult;
+    }
   }
 
   return error;

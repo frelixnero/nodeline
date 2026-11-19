@@ -1,56 +1,63 @@
 import toposort from "toposort";
-import type { Node } from "@xyflow/react";
+import { NonRetriableError } from "inngest";
 import { Connection } from "@/generated/prisma/client";
-import { boolean } from "zod";
 import { inngest } from "./client";
 
 export const topologicalSort = <T extends { id: string }>(
     nodes: T[],
     connections: Connection[]
 ): T[] => {
+    const nodeIds = nodes.map((node) => node.id);
+    const nodeIdSet = new Set(nodeIds);
 
-    // If no connection, return as-is (they're all independent)
-    if (connections.length === 0) {
+    // Keep only edges between nodes that actually exist in this workflow.
+    // Drop self-loops (a node depending on itself is not a valid dependency)
+    // and duplicate edges.
+    const seen = new Set<string>();
+    const edges: [string, string][] = [];
+
+    for (const conn of connections) {
+        if (!nodeIdSet.has(conn.fromNodeId) || !nodeIdSet.has(conn.toNodeId)) {
+            continue;
+        }
+        if (conn.fromNodeId === conn.toNodeId) {
+            continue;
+        }
+        const key = `${conn.fromNodeId}->${conn.toNodeId}`;
+        if (seen.has(key)) {
+            continue;
+        }
+        seen.add(key);
+        edges.push([conn.fromNodeId, conn.toNodeId]);
+    }
+
+    // No dependency constraints: keep the original order (nodes can run in any order).
+    if (edges.length === 0) {
         return nodes;
     }
 
-    //  Create edgews array for topo sort
-    const edges: [string, string][] = connections.map((conn) => [
-        conn.fromNodeId,
-        conn.toNodeId
-    ]);
-
-    //  Add nodes with no connecions as self edges to ensure they're included
-    const connectedNodeIds = new Set<string>();
-    for (const conn of connections) {
-        connectedNodeIds.add(conn.fromNodeId)
-        connectedNodeIds.add(conn.toNodeId)
-    }
-
-    for (const node of nodes) {
-        if (!connectedNodeIds.has(node.id)) {
-            edges.push([node.id, node.id])
-        }
-    }
-
-    // perform topological sort
-    let sortedNodeIds: string[]
+    let sortedNodeIds: string[];
     try {
-        sortedNodeIds = toposort(edges);
-
-        // remove duplicates
-        sortedNodeIds = [...new Set(sortedNodeIds)];
+        // `toposort.array` accepts a full node list, so unconnected nodes are
+        // included in the result without needing fake self-edges (which the
+        // library treats as a cycle).
+        sortedNodeIds = toposort.array(nodeIds, edges);
     } catch (error) {
-        if (error instanceof Error && error.message.includes("Cyclic dependencies detected")) {
-            throw new Error("Workflow has a cycle!")
+        if (
+            error instanceof Error &&
+            error.message.includes("Cyclic dependency")
+        ) {
+            throw new NonRetriableError(
+                `Workflow has a cycle: ${error.message}. Remove the loop and try again.`,
+                { cause: error },
+            );
         }
         throw error;
     }
 
     const nodeMap = new Map(nodes.map((node) => [node.id, node]));
-
-    return sortedNodeIds.map((id) => nodeMap.get(id)!).filter(Boolean)
-}   
+    return sortedNodeIds.map((id) => nodeMap.get(id)!).filter(Boolean);
+};
 
 export const sendWorkflowExecution = async ( data: {
     workflowId: string;
@@ -60,4 +67,4 @@ export const sendWorkflowExecution = async ( data: {
         name: "workflow/execute.workflow",
         data,
     });
-}
+};

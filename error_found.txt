@@ -16,3 +16,19 @@ Executing workflows from the UI will now successfully parse and process server r
 
 
 1. Key Collision 
+
+2. Fixed and verified.
+Root cause
+src/inngest/utils.ts added a self-edge [id, id] for every unconnected node so it'd show up in the sort. The toposort package treats a self-edge as a cycle and throws Cyclic dependency, node was:"gmitvcj8...". Your failing node was the isolated ANTHROPIC node (no incoming/outgoing edges) in a workflow where MANUAL_TRIGGER → DISCORD is wired.
+It looked "stuck" because the old catch checked for "Cyclic dependencies detected" (wrong string), so the raw Error escaped and Inngest kept retrying a deterministic failure.
+Changes
+src/inngest/utils.ts — rewrote topologicalSort:
+- Uses toposort.array(nodeIds, edges) with the full node list, so unconnected nodes are included without fake self-edges.
+- Drops self-loops, edges pointing at unknown node IDs, and duplicate edges.
+- A genuine cycle now throws NonRetriableError with a clear message, so it fails the run immediately instead of retry-looping.
+src/features/editor/components/editor.tsx — onConnect now ignores self-connections (source === target), so a node can't be wired to itself going forward.
+Verification
+- npx tsc --noEmit passes.
+- Reproduced your exact graph shape (connected chain + isolated node): prepare-workflow now COMPLETED, no more cyclic error, and execution reaches the node executors.
+- Direct toposort sanity check: array(["start","discord","anthropic"], [["start","discord"]]) → all three included; the old self-edge throws the exact Cyclic dependency, node was:"anthropic"; a real a→b→a cycle still throws (now caught and converted).
+Your workflow should run now. Note: the isolated Anthropic node will execute with just the trigger's context (it isn't wired to Discord), so its output won't feed into anything. If that node is intentional, connect it; otherwise delete it.

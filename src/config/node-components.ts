@@ -2,15 +2,15 @@ import { InitialNode } from "@/components/initial-node";
 import { NodeType } from "@/generated/prisma/browser";
 import type { NodeTypes } from "@xyflow/react";
 
-import { HttpRequestNode } from "@/features/executions/http-requests/node";
+import { HttpRequestNode } from "@/features/executions/components/http-requests/node";
 import { ManualTriggerNode } from "@/features/triggers/components/manual-triggers/node";
 import { GoogleFormTriggerNode } from "@/features/triggers/components/google-form-trigger/node";
 import { StripeTriggerNode } from "@/features/triggers/components/stripe-trigger/node";
-import { GeminiNode } from "@/features/executions/gemini/node";
-import { OpenAINode } from "@/features/executions/openai/node";
+import { GeminiNode } from "@/features/executions/components/gemini/node";
+import { OpenAINode } from "@/features/executions/components/openai/node";
 import { AnthropicNode } from "@/features/executions/anthropic/node";
-import { DiscordNode } from "@/features/executions/discord/node";
-import { SlackNode } from "@/features/executions/slack/node";
+import { DiscordNode } from "@/features/executions/components/discord/node";
+import { SlackNode } from "@/features/executions/components/slack/node";
 
 export const nodeComponents = {
     [NodeType.INITIAL]: InitialNode,

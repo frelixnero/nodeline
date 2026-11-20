@@ -2,7 +2,7 @@
 
 import { type Node, type NodeProps, useReactFlow } from "@xyflow/react";
 import { memo, useState } from "react";
-import { BaseExecutionNode } from "@/features/executions/componets/base-execution-node"; 
+import { BaseExecutionNode } from "@/features/executions/components/base-execution-node"; 
 import { useNodeStatus } from "../hooks/use-node-status";
 
 import { fetchAnthropicRealtimeToken,} from "./actions";

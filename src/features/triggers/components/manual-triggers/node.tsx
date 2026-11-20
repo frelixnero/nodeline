@@ -4,7 +4,7 @@ import { BaseTriggerNode } from "../base-trigger-node"
 import type { NodeProps } from "@xyflow/react";
 import { ManualTriggerDialog } from "./dialog";
 import { useNodeStatus } from "@/features/executions/hooks/use-node-status";
-import { fetchNodeStatusRealtimeToken } from "@/features/executions/http-requests/actions";
+import { fetchNodeStatusRealtimeToken } from "@/features/executions/components/http-requests/actions";
 
 
 export const ManualTriggerNode = memo((props: NodeProps) => {
